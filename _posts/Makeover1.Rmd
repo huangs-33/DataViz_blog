@@ -10,7 +10,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-## **1. The Original Visualisation**
+## **1. The Original Visualization**
 ![](makeover1-image/original.jpg)
 
 ## **2. Critics**
@@ -221,11 +221,11 @@ Add text to bottom left corner and add text : “DataViz Makeover #1 by HUANG SH
 
 ## **5.  Main Observations**
 
-* Although the amount value of trade shown  volatility during the period from 2019.01 to 2021.01, the Singapore still keep a relatively stable trade surplus, especially, in the current year, the amount trade has increased compared with the pass time
+* Although the amount value of trade shown volatility during the period from 2019.01 to 2021.01, the Singapore still keep a relatively stable trade surplus, especially, in the current year, the amount trade has increased compared with the pass time
 
-* The major trade partners in Singapore divided into two groups, one is the big region which has large consumer power or producer ability, another one is the neighbor countries which have close distance and low cost transportation cost
+* The major trade partners in Singapore divided into two groups, one is the big region which has large consumer power or producer ability, another one is the neighbor countries which have close distance and low cost (like transportation cost.etc)
 
-*	Compared with the trade value distribution among the top6 regions, it obviously show the top 3 region which have large population shows the large demand both in import and export, while the other 3 regions with small areas and population, could always show the imbalance in the two converse direction trade,like Taiwan is an important supplier for Singapore while it does't heavily dependent on Singapore
+*	Compared with the trade value distribution among the top6 regions, it obviously tells that the top 3 regions which have large population show relatively higher demand both in import and export, while the other 3 regions with small areas and population, could always show the imbalance in the two converse direction trade,like Taiwan is an important supplier for Singapore while it doesn't heavily dependent on Singapore
 
 
 
