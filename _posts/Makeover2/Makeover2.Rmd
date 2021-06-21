@@ -13,8 +13,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## **1.	Introduction**
 This makeover aims to explore different perspectives and approaches to improve the original visualization.
-The original visualization tried to present the performance of Singaporeâ€™s major merchandise trade partner.
+The original visualization tried to present the performance of Singaporeâs major merchandise trade partner.
 Here is the row chart from (Department of Statistics, Singapore)
+
+![](makeover1-image/2-1.jpg)
+
+
+
+
+
+
 
 
 ## **2. Critics of original visualization**
@@ -25,9 +33,13 @@ Here is the row chart from (Department of Statistics, Singapore)
 
 Just show the absolute number in Axis without explanation, it could confuse viewer to compare the import value and export value easily and correctly.
 
+![](Makeover2-image/2.1.jpg)
+
+
 *	Inconsistent of content between chart and comments
 
 The data presented in chart based on 2020 while the comment gives the conclusion for past years. Obviously, there are no enough information to support the idea.
+![](Makeover2-image/3.1.jpg)
 
 * Meaningless of grouped color for circles
 

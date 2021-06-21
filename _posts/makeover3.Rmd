@@ -10,7 +10,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+
 ## **1.	Introduction**
 This makeover aims to explore different perspectives and approaches to improve the original visualization.
 The original visualization tried to present the performance of Singapore’s major merchandise trade partner.
