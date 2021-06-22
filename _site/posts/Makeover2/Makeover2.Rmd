@@ -1,0 +1,255 @@
+---
+title: "Makevoer2"
+author: "HUANG Shan"
+date: "6/20/2021"
+output: 
+  distill::distill_article:
+    self_contained: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **1.	Introduction**
+This makeover aims to explore different perspectives and approaches to improve the original visualization.
+The original visualization tried to present the performance of Singapore’s major merchandise trade partner.
+Here is the row chart from (Department of Statistics, Singapore)
+
+![](makeover1-image/2-1.jpg)
+
+
+
+
+
+
+
+
+
+## **2. Critics of original visualization**
+
+### Clarity:
+
+*	Missing units in Y-axis and X-axis
+
+Just show the absolute number in Axis without explanation, it could confuse viewer to compare the import value and export value easily and correctly.
+
+![](Makeover2-image/2.1.jpg)
+
+
+*	Inconsistent of content between chart and comments
+
+The data presented in chart based on 2020 while the comment gives the conclusion for past years. Obviously, there are no enough information to support the idea.
+![](Makeover2-image/3.1.jpg)
+
+* Meaningless of grouped color for circles
+
+There are no principle to define the color group. For example, the color in Thailand and EU are same, but no similar characteristics shown. It would mislead the user to get the right information.
+
+* Lack of necessary information 
+
+For the annotation in the visualization, just show a single amount but not explain the meaning of the number, reader cannot conclude the value whether is means trade surplus value or total trade value 
+
+*	Indirectly presentation
+
+By the center point to present the region whether is net importer or exporter are not directly enough let viewer detect the net trade status at a glance
+
+Icon of import and export also not easily to get the meaning
+
+### Aesthetics:
+*	Chart details
+
+The annotation have over the zone of the visualization which look like unnice.
+
+* Unsuitable size of icon
+
+As the chart shown, the icon of net export and net importer are not easy to identify without other information, so obviously is not a good indicator in the visualization
+
+* Unsuitable type of chart
+
+As the discrete type of data, it more suitable be presented in bar chart
+
+* Unsuitable size of annotation
+
+The explanation of icon is bigger than the comment which could miss the importance
+
+## **3. Proposed Design**
+
+### 3.1 Sketch
+
+![](makeover1-image/sketch.jpg)
+
+### 3.2 Advantages of Proposed Design
+
+* Add past trade performance data to support the comments
+
+* Interactive the line chart on tooltip enable user could see the relative past information when mouse hoke the specified shape
+
+* Use national flag to present the each region to improve the aesthetics and comprehensible
+
+*Make up the annotation，add information to dispaly the meaning of each value 
+
+* Use words instead of graph to present the net porter and exporter
+
+* Add units for the axis
+
+* Add filter based on date to support user can view yearly trade performance
+
+
+## **4. Data Visualisation Steps**
+
+### 4.1 Preparation of data
+
+i) unzip the file and drag the file to anywhere in the interface
+图
+ 
+ii)	Use the data interpreter to select useful data
+
+iii)	Drag T1 to XX, add filter
+
+### 4.2 Visualization of data
+
+i) Import the new data file into the tableau
+
+ii) Change the data type—column “date” to data type
+
+### 4.2.1	Overview tab
+
+* Import relative data
+
+Drag [Merchandised Import] and [Merchandised Export] to Rows and drag [Day] to Columns.
+
+
+
+![](makeover1-image/1-1.jpg)
+
+* Apply Filter
+
+Drag [Merchandized Export] to Filters panel
+
+![](makeover1-image/1-2.jpg)
+
+* Apply color
+
+![](makeover1-image/1-3.jpg)
+
+* Edit axis
+
+Make the two range of the axis are same and rename the axis to export and import to clearly presented.
+
+![](makeover1-image/1-4.jpg)
+
+* Shade the axis color to match the chart color
+
+![](makeover1-image/1-5.jpg)
+
+* Add title and commentary
+
+![](makeover1-image/1-6.jpg)
+
+* The final results
+
+![](makeover1-image/Overview.jpg)
+
+### 4.2.2 Top Regions Tab
+
+* Import relative data
+
+Drag [Merchandised Import] and [Merchandized Export] to Rows and Columns respectively
+
+![](makeover1-image/2-1.jpg)
+
+* Add new calculated filed 
+
+Named total value which equals :[ total merchandised import] add [total merchandised export]
+
+![](makeover1-image/2-2.jpg)
+
+* Drag the [Total value] to size, drag the [Region/Markets] to color.
+
+![](makeover1-image/2-3.jpg)
+
+* Group the top6 regions and color them to differentiate with others.
+
+![](makeover1-image/2-4.jpg)
+
+* Add annotation to stress the information
+
+![](makeover1-image/2-5.jpg)
+
+
+* Add the title and commentary
+
+![](makeover1-image/2-6.jpg)
+* Add the title and commentary
+
+![](makeover1-image/2-7.jpg)
+
+* The final results
+
+![](makeover1-image/Top Regions.jpg)
+
+### 4.2.3 Top Region Monthly Distribution Tab
+
+* Import relative data
+
+Drag [Merchandized Import], [Merchandized Export] and [Region/Markets] to Rows and drag [Date] to Columns 
+
+![](makeover1-image/3-1.jpg)
+
+* Edit the axis
+
+Make the axis to reverse, fixe the axis range and rename the axis
+
+![](makeover1-image/3-2.jpg)
+
+* Sort the display by region 
+
+![](makeover1-image/3-3.jpg)
+
+* Color the chart in terms of the year periods
+
+![](makeover1-image/3-4.jpg)
+
+![](makeover1-image/3-5.jpg)
+
+* Add the title and commentary
+
+![](makeover1-image/3-6.jpg)
+
+* The final results
+
+![](makeover1-image/Top Region Monthly Distritbution.jpg)
+
+### 4.2.4 Dashboard 
+
+* Select size - automatic
+
+
+* Drag the charts and make layout to show appropriatly 
+
+
+
+* Add source
+
+Using Objects > Text > drag to bottom and add data source and notices
+
+
+* Add author
+
+Add text to bottom left corner and add text : “DataViz Makeover #1 by HUANG SHAN (shan.huang.2020@mitb.smu.edu.sg) align left
+
+* The final results
+
+![](makeover1-image/Dashboard 1.jpg)
+
+## **5.  Main Observations**
+
+* Although the amount value of trade shown volatility during the period from 2019.01 to 2021.01, the Singapore still keep a relatively stable trade surplus, especially, in the current year, the amount trade has increased compared with the pass time
+
+* The major trade partners in Singapore divided into two groups, one is the big region which has large consumer power or producer ability, another one is the neighbor countries which have close distance and low cost (like transportation cost.etc)
+
+*	Compared with the trade value distribution among the top6 regions, it obviously tells that the top 3 regions which have large population show relatively higher demand both in import and export, while the other 3 regions with small areas and population, could always show the imbalance in the two converse direction trade,like Taiwan is an important supplier for Singapore while it doesn't heavily dependent on Singapore
+
+
+
