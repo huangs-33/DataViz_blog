@@ -1,0 +1,246 @@
+---
+title: "Assign"
+description: |
+  VAST Challenge MC2
+author:
+  - name: HUANG Shan
+date: 07-25-2021
+output:
+  distill::distill_article:
+    self_contained: false
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+#Content
+introduction
+literature review
+data preparation
+solution for questions
+data visualization
+observation 
+
+# 1. Introduction
+Mini-Challenge 2
+Mini-Challenge 2 asks you to analyze movement and tracking data. GAStech provides many of their employees with company cars for their personal and professional use, but unbeknownst to the employees, the cars are equipped with GPS tracking devices. You are given tracking data for the two weeks leading up to the disappearance, as well as credit card transactions and loyalty card usage data. Based on this data, identify anomalies and suspicious behaviors,also provide evidence to  identify which people use which credit and loyalty cards.
+
+# 2. Literature review
+
+# 3. Data preparation
+
+3.1 Loading needed packages
+
+```{r}
+packages = c('DT', 'ggiraph', 'plotly', 'tidyverse','igraph', 'tidygraph',  'visNetwork', 
+             'lubridate', 'clock', 'patchwork','tidytext', 
+             'widyr', 'wordcloud',
+             'ggwordcloud', 
+             'textplot', 
+             'hms')
+           
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+```
+
+3.2 Importing data files
+
+
+```{r}
+
+cc_data <- read_csv("Data/cc_data0.csv")
+assignments <-read_csv("Data/car_assignments.csv")
+gps<-read_csv("Data/gps.csv")
+loyalty<-read_csv("Data/loyalty_data.csv")
+glimpse(cc_data)
+glimpse(assignments)
+glimpse(gps)
+glimpse(loyalty)
+
+```
+
+3.3 Cleanning dataset
+By overview the data, there are some wrong data type setting and missing data or characters, so next step would clean the datasets.
+
+3.3.1 change data type
+timestamp: character to date
+last4ccnum: dbl to character
+recode the timstamp to generate new variable needed
+
+```{r}
+cc_data$timestamp <-  date_time_parse(cc_data$timestamp,
+                                      zone = "",
+                                      format = "%m/%d/%Y %H:%M")
+cc_data$last4ccnum <- as.character(cc_data$last4ccnum)
+cc_data$Day  = get_day(cc_data$timestamp)
+cc_data$Hour = get_hour(cc_data$timestamp)
+glimpse(cc_data)
+
+```
+
+
+
+
+```{r}
+loyalty$timestamp <-  date_time_parse(loyalty$timestamp,
+                                      zone = "",
+                                      format = "%m/%d/%Y")
+loyalty$loyaltynum <- as.character(loyalty$loyaltynum)
+month1<-months(loyalty$timestamp)
+loyalty$week<-weekdays(loyalty$timestamp)
+loyalty$Day  = get_day(loyalty$timestamp)
+
+glimpse(loyalty)
+```
+
+3.3.2 recode the variable name
+
+```{r}
+cc_data[str_detect(cc_data[,2,drop=TRUE],
+                   "Katerina"),2]<-as.character("Katerina's cafe")
+```
+
+```{r}
+loyalty[str_detect(loyalty[,2,drop=TRUE],
+                   "Katerina"),2]<-as.character("Katerina's cafe")
+```
+
+# 4.1 SolutionS for questions
+Q1
+
+overview of frequency distribution of each location based on credit card data and loyalty card data
+```{r}
+
+p_cc<-ggplot(data=cc_data, aes(x=location)) +
+  geom_bar() +
+  coord_flip() 
+
+p_cc1<-ggplotly(p_cc)
+
+
+
+
+p_loya<-ggplot(data=loyalty, aes(x=location)) +
+  geom_bar() +
+  coord_flip() +
+  scale_y_continuous(NULL,               
+                     breaks = NULL)
+
+p_loya1<-ggplotly(p_loya)
+
+
+subplot(ggplotly(p_loya1),
+        ggplotly(p_cc1))
+  
+
+```
+
+most popular locations based cc_data
+```{R}
+cc_data %>%
+  mutate(location = fct_infreq(location)) %>%
+  ggplot(aes(x = location)) + 
+  geom_bar()+
+  ylim(0,250) +
+  geom_text(stat="count", 
+      aes(label=paste0(..count.., ", ", 
+      round(..count../sum(..count..)*100,
+            1), "%")),
+      vjust=-1) +
+  xlab("location") +
+  ylab("Count") +
+  theme(axis.title.y=element_text(angle = 0))+
+  coord_flip() 
+```
+based on the results, pick top4 high popular locations which are Katerina's cafe, Hippokampos, Guy's Gyros and Brew've Been Served, filter them into a new dataset named Top4
+
+```{r}
+Top4<-cc_data %>%
+  filter(location == "Katerina's cafe"|
+         location == "Hippokampos"|
+         location == "Guy's Gyros"|
+         location == "Brew've Been Served")
+glimpse(Top4)
+  
+```
+
+plot the density chart of main location in terms of time
+
+```{r}
+
+ggplot(data=Top4, aes(x=Hour,
+                      colour=location)) +
+ geom_density()+
+  coord_cartesian(xlim=c(0,24))
+  
+```
+The result shown that Katerina's cafe, Hippokampos and Guy's Gyros have the similar pattern which time period 13-14 and 19-20 are the most popular time empolyee would occur. while the location of Brew've Been Served with a totaly different performance that most of the activity occur during 7-8 but other time almost nobody occured
+
+```{r}
+Brewve_Been_Served<-cc_data %>%
+  filter(location == "Brew've Been Served")
+glimpse(Brewve_Been_Served)
+  
+```
+
+```{r}
+
+ggplot(data=Brewve_Been_Served, aes(x=Hour,)) +
+ geom_density()
+  
+```
+
+
+
+overview of frequency distribution of each location based on loyalty card data
+```{r}
+
+ggplot(data=loyalty, aes(x=location)) +
+  geom_bar() +
+  coord_flip() 
+```
+
+```{R}
+loyalty %>%
+  mutate(location = fct_infreq(location)) %>%
+  ggplot(aes(x = location)) + 
+  geom_bar()+
+  ylim(0,250) +
+  geom_text(stat="count", 
+      aes(label=paste0(..count.., ", ", 
+      round(..count../sum(..count..)*100,
+            1), "%")),
+      vjust=-1) +
+  xlab("location") +
+  ylab("Count") +
+  theme(axis.title.y=element_text(angle = 0))+
+  coord_flip() 
+```
+
+
+```{r}
+Top4_loya<-loyalty %>%
+  filter(location == "Katerina's cafe"|
+         location == "Hippokampos"|
+         location == "Guy's Gyros"|
+         location == "Brew've Been Served")
+glimpse(Top4_loya)
+```
+
+```{r}
+
+ggplot(data=Top4_loya, aes(x=Day,
+                      colour=location)) +
+ geom_density()
+
+  
+```
+
+

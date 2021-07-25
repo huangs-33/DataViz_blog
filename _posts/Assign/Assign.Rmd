@@ -2,8 +2,12 @@
 title: "Assign"
 author: "HUANG Shan"
 date: "7/17/2021"
-output: html_document
+output: 
+  distill::distill_article:
+    self_contained: false
 ---
+
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -174,7 +178,4 @@ loyalty %>%
   coord_flip() 
 ```
 
-group
 
-
-the most popular location is  cafe, hippokampos, guy's gyros, brew've been served
