@@ -40,7 +40,10 @@ packages = c('DT', 'ggiraph', 'plotly', 'tidyverse','igraph', 'tidygraph',  'vis
              'widyr', 'wordcloud',
              'ggwordcloud', 
              'textplot', 
-             'hms')
+             'hms',
+             'raster', 'sf', 
+             'tmap'
+             )
            
 for(p in packages){
   if(!require(p, character.only = T)){
@@ -87,11 +90,23 @@ glimpse(cc_data)
 
 
 
+```{r}
+cc_data$Date<-as.Date(cc_data$timestamp)
+cc_data$Date <- as.character(cc_data$Date)
+
+
+```
+
+
+
+
 
 ```{r}
 loyalty$timestamp <-  date_time_parse(loyalty$timestamp,
                                       zone = "",
                                       format = "%m/%d/%Y")
+loyalty$Date <-  as.Date(loyalty$timestamp)
+loyalty$Date <- as.character(loyalty$Date)
 loyalty$loyaltynum <- as.character(loyalty$loyaltynum)
 month1<-months(loyalty$timestamp)
 loyalty$week<-weekdays(loyalty$timestamp)
@@ -114,37 +129,27 @@ loyalty[str_detect(loyalty[,2,drop=TRUE],
 
 # 4.1 SolutionS for questions
 Q1
+join
+```{r}
+join_data<-left_join(cc_data, loyalty, by = c("location", "price","Date"))
+```
 
 overview of frequency distribution of each location based on credit card data and loyalty card data
 ```{r}
 
-p_cc<-ggplot(data=cc_data, aes(x=location)) +
+
+p<-ggplot(data=join_data, aes(x=location)) +
   geom_bar() +
   coord_flip() 
 
-p_cc1<-ggplotly(p_cc)
-
-
-
-
-p_loya<-ggplot(data=loyalty, aes(x=location)) +
-  geom_bar() +
-  coord_flip() +
-  scale_y_continuous(NULL,               
-                     breaks = NULL)
-
-p_loya1<-ggplotly(p_loya)
-
-
-subplot(ggplotly(p_loya1),
-        ggplotly(p_cc1))
-  
-
+ggplotly(p)
 ```
+
+
 
 most popular locations based cc_data
 ```{R}
-cc_data %>%
+join_data %>%
   mutate(location = fct_infreq(location)) %>%
   ggplot(aes(x = location)) + 
   geom_bar()+
@@ -159,15 +164,17 @@ cc_data %>%
   theme(axis.title.y=element_text(angle = 0))+
   coord_flip() 
 ```
-based on the results, pick top4 high popular locations which are Katerina's cafe, Hippokampos, Guy's Gyros and Brew've Been Served, filter them into a new dataset named Top4
 
+
+
+based on the results, pick top4 high popular locations which are Katerina's cafe, Hippokampos, Guy's Gyros and Brew've Been Served, filter them into a new dataset named join_Top4
 ```{r}
-Top4<-cc_data %>%
+join_Top4<-join_data %>%
   filter(location == "Katerina's cafe"|
          location == "Hippokampos"|
          location == "Guy's Gyros"|
          location == "Brew've Been Served")
-glimpse(Top4)
+glimpse(join_Top4)
   
 ```
 
@@ -175,13 +182,28 @@ plot the density chart of main location in terms of time
 
 ```{r}
 
-ggplot(data=Top4, aes(x=Hour,
+ggplot(data=join_Top4, aes(x=Hour,
                       colour=location)) +
  geom_density()+
   coord_cartesian(xlim=c(0,24))
   
 ```
 The result shown that Katerina's cafe, Hippokampos and Guy's Gyros have the similar pattern which time period 13-14 and 19-20 are the most popular time empolyee would occur. while the location of Brew've Been Served with a totaly different performance that most of the activity occur during 7-8 but other time almost nobody occured
+
+
+plot the density chart of main location in terms of day
+```{r}
+
+ggplot(data=join_Top4, aes(x=Day.y,
+                      colour=location)) +
+ geom_density()
+
+  
+```
+
+
+plot the density chart of main location in terms of time
+
 
 ```{r}
 Brewve_Been_Served<-cc_data %>%
@@ -199,48 +221,84 @@ ggplot(data=Brewve_Been_Served, aes(x=Hour,)) +
 
 
 
-overview of frequency distribution of each location based on loyalty card data
-```{r}
 
-ggplot(data=loyalty, aes(x=location)) +
-  geom_bar() +
-  coord_flip() 
+
+Q2
+```{r}
+bgmap <- raster("Data/Geospatial/MC2-tourist.tif")
+bgmap
+```
+```{r}
+tm_shape(bgmap) +
+tm_rgb(bgmap, r = 1,g = 2,b = 3,
+       alpha = NA,
+       saturation = 1,
+       interpolate = TRUE,
+       max.value = 255)
+```
+
+```{r}
+Abila_st <- st_read(dsn = "Data/Geospatial",
+                    layer = "Abila")
+```
+
+```{r}
+gps <- read_csv("Data/gps.csv")
+glimpse(gps)
 ```
 
 ```{R}
-loyalty %>%
-  mutate(location = fct_infreq(location)) %>%
-  ggplot(aes(x = location)) + 
-  geom_bar()+
-  ylim(0,250) +
-  geom_text(stat="count", 
-      aes(label=paste0(..count.., ", ", 
-      round(..count../sum(..count..)*100,
-            1), "%")),
-      vjust=-1) +
-  xlab("location") +
-  ylab("Count") +
-  theme(axis.title.y=element_text(angle = 0))+
-  coord_flip() 
+gps$Timestamp <- date_time_parse(gps$Timestamp,
+                zone = "",
+                format = "%m/%d/%Y %H:%M:%S")
+gps$day <- as.factor(get_day(gps$Timestamp))
 ```
 
+```{R}
+gps$id <- as_factor(gps$id)
+gps
+```
+```{r}
+gps_sf <- st_as_sf(gps, 
+                   coords = c("long", "lat"),
+                       crs= 4326)
+gps_sf
+```
+```{r}
+gps_path <- gps_sf %>%
+  group_by(id, day) %>%
+  summarize(m = mean(Timestamp), 
+            do_union=FALSE) %>%
+  st_cast("LINESTRING")
+gps_path
+```
 
 ```{r}
-Top4_loya<-loyalty %>%
-  filter(location == "Katerina's cafe"|
-         location == "Hippokampos"|
-         location == "Guy's Gyros"|
-         location == "Brew've Been Served")
-glimpse(Top4_loya)
+gps_path_selected <- gps_path %>%
+  filter(id==1)
+tmap_mode("view")
+tm_shape(bgmap) +
+  tm_rgb(bgmap, r = 1,g = 2,b = 3,
+       alpha = NA,
+       saturation = 1,
+       interpolate = TRUE,
+       max.value = 255) +
+  tm_shape(gps_path_selected) +
+  tm_lines()
 ```
 
 ```{r}
+m <- tm_shape(bgmap) +
+  tm_rgb(bgmap, r = 1,g = 2,b = 3,
+       alpha = NA,
+       saturation = 1,
+       interpolate = TRUE,
+       max.value = 255) +
+  tm_shape(gps_path) +
+  tm_lines() +
+  tm_facets(along = "id")
+tmap_animation(m, 
+               filename = "gif/drivers.gif",
+               delay=40)
 
-ggplot(data=Top4_loya, aes(x=Day,
-                      colour=location)) +
- geom_density()
-
-  
 ```
-
-
