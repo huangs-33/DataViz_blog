@@ -1,0 +1,180 @@
+---
+title: "Assign"
+author: "HUANG Shan"
+date: "7/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+load packages
+```{r}
+packages = c('DT', 'ggiraph', 'plotly', 'tidyverse','igraph', 'tidygraph',  'visNetwork', 
+             'lubridate', 'clock', 'patchwork','tidytext', 
+             'widyr', 'wordcloud',
+             'ggwordcloud', 
+             'textplot', 
+             'hms')
+           
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+```
+
+impoting data file
+```{r}
+
+cc_data <- read_csv("Data/cc_data.csv")
+assignments <-read_csv("Data/car_assignments.csv")
+gps<-read_csv("Data/gps.csv")
+loyalty<-read_csv("Data/loyalty_data0.csv")
+glimpse(cc_data)
+glimpse(assignments)
+glimpse(gps)
+glimpse(loyalty)
+
+```
+
+```{r}
+cc_data[str_detect(cc_data[,2,drop=TRUE],
+                   "Katerina"),2]<-as.character("Katerina's cafe")
+```
+
+```{r}
+loyalty[str_detect(loyalty[,2,drop=TRUE],
+                   "Katerina"),2]<-as.character("Katerina's cafe")
+```
+
+cahgne the data type
+```{r}
+cc_data$timestamp <-  date_time_parse(cc_data$timestamp,
+                                      zone = "",
+                                      format = "%m/%d/%Y %H:%M")
+cc_data$last4ccnum <- as.character(cc_data$last4ccnum)
+cc_data$Day  = get_day(cc_data$timestamp)
+cc_data$Hour = get_hour(cc_data$timestamp)
+glimpse(cc_data)
+
+```
+##需要注意
+
+```{r}
+loyalty$timestamp <-  date_time_parse(loyalty$timestamp,
+                                      zone = "",
+                                      format = "%m/%d/%Y %H:%M")
+loyalty$loyaltynum <- as.character(loyalty$loyaltynum)
+loyalty$Day  = get_day(loyalty$timestamp)
+loyalty$Hour = get_hour(loyalty$timestamp)
+glimpse(loyalty)
+```
+
+
+#Q1
+PLOT
+```{r}
+
+ggplot(data=cc_data, aes(x=location)) +
+  geom_bar() +
+  coord_flip() 
+```
+most popular locations based cc_data
+```{R}
+cc_data %>%
+  mutate(location = fct_infreq(location)) %>%
+  ggplot(aes(x = location)) + 
+  geom_bar()+
+  ylim(0,250) +
+  geom_text(stat="count", 
+      aes(label=paste0(..count.., ", ", 
+      round(..count../sum(..count..)*100,
+            1), "%")),
+      vjust=-1) +
+  xlab("location") +
+  ylab("Count") +
+  theme(axis.title.y=element_text(angle = 0))+
+  coord_flip() 
+```
+
+
+```{r}
+Top4<-cc_data %>%
+  filter(location == "Katerina's cafe"|
+         location == "Hippokampos"|
+         location == "Guy's Gyros"|
+         location == "Brew've Been Served")
+glimpse(Top4)
+  
+```
+
+```{r}
+
+ggplot(data=Top4, aes(x=Hour,
+                      colour=location)) +
+ geom_density()
+  
+```
+```{r}
+Brewve_Been_Served<-cc_data %>%
+  filter(location == "Brew've Been Served")
+glimpse(Brewve_Been_Served)
+  
+```
+
+```{r}
+
+ggplot(data=Brewve_Been_Served, aes(x=Hour,)) +
+ geom_density()
+  
+```
+
+```{r}
+Kcafe<-cc_data %>%
+  filter(location == "Katerina's cafe")
+glimpse(Kcafe)
+  
+```
+```{r}
+
+ggplot(data=Kcafe, aes(x=Hour,)) +
+ geom_density()+
+  coord_cartesian(xlim=c(0,24))
+  
+```
+
+
+
+
+
+most popular locations based loy_data
+```{r}
+
+ggplot(data=loyalty, aes(x=location)) +
+  geom_bar() +
+  coord_flip() 
+```
+
+```{R}
+loyalty %>%
+  mutate(location = fct_infreq(location)) %>%
+  ggplot(aes(x = location)) + 
+  geom_bar()+
+  ylim(0,250) +
+  geom_text(stat="count", 
+      aes(label=paste0(..count.., ", ", 
+      round(..count../sum(..count..)*100,
+            1), "%")),
+      vjust=-1) +
+  xlab("location") +
+  ylab("Count") +
+  theme(axis.title.y=element_text(angle = 0))+
+  coord_flip() 
+```
+
+group
+
+
+the most popular location is  cafe, hippokampos, guy's gyros, brew've been served
